@@ -135,13 +135,24 @@ while run:
         if event.type == pygame.KEYDOWN:
             match event.key:
                 case pygame.K_RIGHT:
-                    direction = 0
+                    direction_command = 0
                 case pygame.K_LEFT:
-                    direction = 1
+                    direction_command = 1
                 case pygame.K_UP:
-                    direction = 2
+                    direction_command = 2
                 case pygame.K_DOWN:
-                    direction = 3    
+                    directdirection_commandion = 3
+                     
+        if event.type == pygame.KEYDOWN:
+            match event.key:
+                case pygame.K_RIGHT:
+                    direction_command = 0
+                case pygame.K_LEFT:
+                    direction_command = 1
+                case pygame.K_UP:
+                    direction_command = 2
+                case pygame.K_DOWN:
+                    directdirection_commandion = 3  
                 
         
     pygame.display.flip()
