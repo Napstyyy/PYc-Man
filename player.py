@@ -9,6 +9,7 @@ class Player():
         self.counter = 0
         self.speed = 2
         self.images = [pygame.transform.scale(pygame.image.load(f'assets/PlayerImages/{i}.png'), (45, 45)) for i in range(1, 5)]
+        self.lives = 3
     
     def draw(self, screen):
          # 0-RIGHT, 1-LEFT, 2-UP, 3-DOWN
