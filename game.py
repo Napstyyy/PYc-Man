@@ -31,6 +31,7 @@ class Game:
         self.powerUp = False
         self.powerCount = 0
         self.eatenGhosts = [False, False, False, False]
+        self.ghost_speeds = [2, 2, 2, 2]
         self.targets = [(self.player.x, self.player.y), (self.player.x, self.player.y), (self.player.x, self.player.y), (self.player.x, self.player.y)]
         self.moving = False
         self.startUpCounter = 0
@@ -266,17 +267,17 @@ class Game:
             centerY = self.player.y + 24
             player_circle = pygame.draw.circle(self.screen, 'black', (centerX, centerY), 20, 2)
             self.player.draw(self.screen)
-            Blinky = Ghost(self.blinky.x, self.blinky.y, self.targets[0], self.blinky.speed, self.blinky.img, self.blinky.direction, self.blinky.dead, self.blinky.box, 0, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
-            Inky = Ghost(self.inky.x, self.inky.y, self.targets[1], self.inky.speed, self.inky.img, self.inky.direction, self.inky.dead, self.inky.box, 1, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
-            Pinky = Ghost(self.pinky.x, self.pinky.y, self.targets[2], self.pinky.speed, self.pinky.img, self.pinky.direction, self.pinky.dead, self.pinky.box, 2, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
-            Clyde = Ghost(self.clyde.x, self.clyde.y, self.targets[3], self.clyde.speed, self.clyde.img, self.clyde.direction, self.clyde.dead, self.clyde.box, 3, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
+            self.blinky = Ghost(self.blinky.x, self.blinky.y, self.targets[0], self.blinky.speed, self.blinky.img, self.blinky.direction, self.blinky.dead, self.blinky.box, 0, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
+            self.inky = Ghost(self.inky.x, self.inky.y, self.targets[1], self.inky.speed, self.inky.img, self.inky.direction, self.inky.dead, self.inky.box, 1, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
+            self.pinky = Ghost(self.pinky.x, self.pinky.y, self.targets[2], self.pinky.speed, self.pinky.img, self.pinky.direction, self.pinky.dead, self.pinky.box, 2, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
+            self.clyde = Ghost(self.clyde.x, self.clyde.y, self.targets[3], self.clyde.speed, self.clyde.img, self.clyde.direction, self.clyde.dead, self.clyde.box, 3, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
             
             self.draw_misc()
             self.targets = self.get_targets(self.blinky.x, self.blinky.y, self.inky.x, self.inky.y, self.pinky.x, self.pinky.y, self.clyde.x, self.clyde.y)
             self.turns_allowed = self.check_position(centerX, centerY)
             if self.moving:
                 self.player.x, self.player.y = self.player.move_player(self.turns_allowed)
-                self.blinky.x, self.blinky.y, self.blinky.direction = Blinky.move_blinky()
+                self.blinky.x, self.blinky.y, self.blinky.direction = self.blinky.move_blinky()
                 self.pinky.x, self.pinky.y, self.pinky.direction = Pinky.move_pinky()
                 self.inky.x, self.inky.y, self.inky.direction = Inky.move_inky()
                 self.clyde.x, self.clyde.y, self.clyde.direction = Clyde.move_clyde()
