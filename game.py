@@ -35,6 +35,7 @@ class Game:
         self.targets = [(self.player.x, self.player.y), (self.player.x, self.player.y), (self.player.x, self.player.y), (self.player.x, self.player.y)]
         self.moving = False
         self.startUpCounter = 0
+        self.game_over = False
 
     def draw_misc(self):
         score_text = self.font.render(f'Score: {self.score}', True, 'white')
@@ -150,20 +151,40 @@ class Game:
             runaway_y = 0
         return_target = (380, 400)
         if self.powerUp:
-            if not self.blinky.dead:
+            if not self.blinky.dead and not self.eatenGhosts[0]:
                 blink_target = (runaway_x, runaway_y)
+            elif not self.blinky.dead and self.eatenGhosts[0]:
+                if 340 < blink_x < 560 and 340 < blink_y < 500:
+                    blink_target = (400, 100)
+                else:
+                    blink_target = (self.player.x, self.player.y)
             else:
                 blink_target = return_target
-            if not self.inky.dead:
+            if not self.inky.dead and not self.eatenGhosts[1]:
                 ink_target = (runaway_x, self.player.y)
+            elif not self.inky.dead and self.eatenGhosts[1]:
+                if 340 < ink_x < 560 and 340 < ink_y < 500:
+                    ink_target = (400, 100)
+                else:
+                    ink_target = (self.player.x, self.player.y)
             else:
                 ink_target = return_target
-            if not self.pinky.dead:
+            if not self.pinky.dead and not self.eatenGhosts[2]:
                 pink_target = (self.player.x, runaway_y)
+            elif not self.pinky.dead and self.eatenGhosts[2]:
+                if 340 < pink_x < 560 and 340 < pink_y < 500:
+                    pink_target = (400, 100)
+                else:
+                    pink_target = (self.player.x, self.player.y)
             else:
                 pink_target = return_target
-            if not self.clyde.dead:
+            if not self.clyde.dead and self.eatenGhosts[3]:
                 clyd_target = (450, 450)
+            elif not self.clyde.dead and self.eatenGhosts[3]:
+                if 340 < clyd_x < 560 and 340 < clyd_y < 500:
+                    clyd_target = (400, 100)
+                else:
+                    clyd_target = (self.player.x, self.player.y)
             else:
                 clyd_target = return_target
         else:
@@ -265,21 +286,51 @@ class Game:
             self.draw_board()
             centerX = self.player.x + 23
             centerY = self.player.y + 24
+            if self.powerUp:
+                self.ghost_speeds = [1, 1, 1, 1]
+            else:
+                self.ghost_speeds = [2, 2, 2, 2]
+            if self.eatenGhosts[0]:
+                self.ghost_speeds[0] = 2
+            if self.eatenGhosts[1]:
+                self.ghost_speeds[1] = 2
+            if self.eatenGhosts[2]:
+                self.ghost_speeds[2] = 2
+            if self.eatenGhosts[3]:
+                self.ghost_speeds[3] = 2   
+            if self.blinky.dead:
+                self.ghost_speeds[0] = 4
+            if self.inky.dead:
+                self.ghost_speeds[1] = 4
+            if self.pinky.dead:
+                self.ghost_speeds[2] = 4
+            if self.clyde.dead:
+                self.ghost_speeds[3] = 4
+                    
             player_circle = pygame.draw.circle(self.screen, 'black', (centerX, centerY), 20, 2)
             self.player.draw(self.screen)
-            self.blinky = Ghost(self.blinky.x, self.blinky.y, self.targets[0], self.blinky.speed, self.blinky.img, self.blinky.direction, self.blinky.dead, self.blinky.box, 0, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
-            self.inky = Ghost(self.inky.x, self.inky.y, self.targets[1], self.inky.speed, self.inky.img, self.inky.direction, self.inky.dead, self.inky.box, 1, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
-            self.pinky = Ghost(self.pinky.x, self.pinky.y, self.targets[2], self.pinky.speed, self.pinky.img, self.pinky.direction, self.pinky.dead, self.pinky.box, 2, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
-            self.clyde = Ghost(self.clyde.x, self.clyde.y, self.targets[3], self.clyde.speed, self.clyde.img, self.clyde.direction, self.clyde.dead, self.clyde.box, 3, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
+            Blinky = Ghost(self.blinky.x, self.blinky.y, self.targets[0], self.ghost_speeds[0], self.blinky.img, self.blinky.direction, self.blinky.dead, self.blinky.box, 0, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
+            Inky = Ghost(self.inky.x, self.inky.y, self.targets[1], self.ghost_speeds[1], self.inky.img, self.inky.direction, self.inky.dead, self.inky.box, 1, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
+            Pinky = Ghost(self.pinky.x, self.pinky.y, self.targets[2], self.ghost_speeds[2], self.pinky.img, self.pinky.direction, self.pinky.dead, self.pinky.box, 2, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
+            Clyde = Ghost(self.clyde.x, self.clyde.y, self.targets[3], self.ghost_speeds[3], self.clyde.img, self.clyde.direction, self.clyde.dead, self.clyde.box, 3, self.__WIDTH, self.__HEIGHT, self.level, self.screen, self.powerUp, self.eatenGhosts)
             
             self.draw_misc()
             self.targets = self.get_targets(self.blinky.x, self.blinky.y, self.inky.x, self.inky.y, self.pinky.x, self.pinky.y, self.clyde.x, self.clyde.y)
             self.turns_allowed = self.check_position(centerX, centerY)
             if self.moving:
                 self.player.x, self.player.y = self.player.move_player(self.turns_allowed)
-                self.blinky.x, self.blinky.y, self.blinky.direction = self.blinky.move_blinky()
-                self.pinky.x, self.pinky.y, self.pinky.direction = Pinky.move_pinky()
-                self.inky.x, self.inky.y, self.inky.direction = Inky.move_inky()
+                if not Blinky.dead and not Blinky.in_box:
+                    self.blinky.x, self.blinky.y, self.blinky.direction = Blinky.move_blinky()
+                else:
+                    self.blinky.x, self.blinky.y, self.blinky.direction = Blinky.move_clyde()
+                if not Pinky.dead and not Pinky.in_box:
+                    self.pinky.x, self.pinky.y, self.pinky.direction = Pinky.move_pinky()
+                else:
+                    self.pinky.x, self.pinky.y, self.pinky.direction = Pinky.move_clyde()
+                if not Inky.dead and not Inky.in_box:
+                    self.inky.x, self.inky.y, self.inky.direction = Inky.move_inky()
+                else:
+                    self.inky.x, self.inky.y, self.inky.direction = Inky.move_clyde()
                 self.clyde.x, self.clyde.y, self.clyde.direction = Clyde.move_clyde()
             self.score, self.powerUp, self.powerCount, self.eatenGhosts = self.check_collisions(centerX, centerY)
 
@@ -311,6 +362,12 @@ class Game:
                         self.inky.dead = False
                         self.clyde.dead = False
                         self.pinky.dead = False
+                    else:
+                        self.game_over = True
+                        self.moving = False
+                        self.startUpCounter = 0
+                        
+                        
             if self.powerUp and player_circle.colliderect(Blinky.rect) and self.eatenGhosts[0] and not self.blinky.dead:
                 if self.player.lives > 0:
                     self.player.lives -= 1
@@ -338,6 +395,10 @@ class Game:
                     self.inky.dead = False
                     self.clyde.dead = False
                     self.pinky.dead = False
+                else:
+                        self.game_over = True
+                        self.moving = False
+                        self.startUpCounter = 0
                     
             if self.powerUp and player_circle.colliderect(Inky.rect) and self.eatenGhosts[1] and not self.inky.dead:
                 if self.player.lives > 0:
@@ -366,7 +427,10 @@ class Game:
                     self.inky.dead = False
                     self.clyde.dead = False
                     self.pinky.dead = False
-                    
+                else:
+                        self.game_over = True
+                        self.moving = False
+                        self.startUpCounter = 0   
             if self.powerUp and player_circle.colliderect(Pinky.rect) and self.eatenGhosts[2] and not self.pinky.dead:
                 if self.player.lives > 0:
                     self.player.lives -= 1
@@ -394,7 +458,11 @@ class Game:
                     self.inky.dead = False
                     self.clyde.dead = False
                     self.pinky.dead = False
-                    
+                else:
+                    self.game_over = True
+                    self.moving = False
+                    self.startUpCounter = 0  
+                        
             if self.powerUp and player_circle.colliderect(Clyde.rect) and self.eatenGhosts[3] and not self.clyde.dead:
                 if self.player.lives > 0:
                     self.player.lives -= 1
@@ -422,21 +490,30 @@ class Game:
                     self.inky.dead = False
                     self.clyde.dead = False
                     self.pinky.dead = False            
+                else:
+                    self.game_over = True
+                    self.moving = False
+                    self.startUpCounter = 0
+            
             if self.powerUp and player_circle.colliderect(Blinky.rect) and not self.blinky.dead and not self.eatenGhosts[0]:
                 self.blinky.dead = True
                 self.eatenGhosts[0] = True
+                self.score += (2 ** self.eatenGhosts.count(True)) * 100
             
             if self.powerUp and player_circle.colliderect(Inky.rect) and not self.inky.dead and not self.eatenGhosts[1]:
                 self.inky.dead = True
                 self.eatenGhosts[1] = True
+                self.score += (2 ** self.eatenGhosts.count(True)) * 100
             
             if self.powerUp and player_circle.colliderect(Pinky.rect) and not self.pinky.dead and not self.eatenGhosts[2]:
                 self.pinky.dead = True
                 self.eatenGhosts[2] = True
+                self.score += (2 ** self.eatenGhosts.count(True)) * 100
                 
             if self.powerUp and player_circle.colliderect(Clyde.rect) and not self.clyde.dead and not self.eatenGhosts[3]:
                 self.clyde.dead = True
                 self.eatenGhosts[3] = True
+                self.score += (2 ** self.eatenGhosts.count(True)) * 100
             
             run = self.handle_events()
 
