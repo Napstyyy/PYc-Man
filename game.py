@@ -3,6 +3,7 @@ from board import boards
 import math
 from player import Player
 from ghosts import *
+import copy
 
 class Game:
     def __init__(self):
@@ -13,7 +14,7 @@ class Game:
         self.timer = pygame.time.Clock()
         self.fps = 60
         self.font = pygame.font.Font('freesansbold.ttf', 20)
-        self.level = boards
+        self.level = copy.deepcopy(boards)
         self.color = 'blue'
         self.PI = math.pi
         #Caracters --------------------------------------
@@ -36,6 +37,8 @@ class Game:
         self.moving = False
         self.startUpCounter = 0
         self.game_over = False
+        self.game_won = False
+        self.gameover_text = ''
 
     def draw_misc(self):
         score_text = self.font.render(f'Score: {self.score}', True, 'white')
@@ -44,6 +47,16 @@ class Game:
             pygame.draw.circle(self.screen, 'blue', (140, 930), 15)
         for i in range(self.player.lives):
             self.screen.blit(pygame.transform.scale(self.player.images[0], (30, 30)), (650 + i * 40, 915))
+        if self.game_over:
+            pygame.draw.rect(self.screen, 'white', [50, 200, 800, 300], 0, 10)
+            pygame.draw.rect(self.screen, 'dark gray', [70, 220, 760, 260], 0, 10)
+            self.gameover_text = self.font.render('Game over! Space bar to restart!', True, 'red')
+            self.screen.blit(self.gameover_text, (100, 300))
+        if self.game_won:
+            pygame.draw.rect(self.screen, 'white', [50, 200, 800, 300], 0, 10)
+            pygame.draw.rect(self.screen, 'dark gray', [70, 220, 760, 260], 0, 10)
+            self.gameover_text = self.font.render('Victory! Space bar to restart!', True, 'green')
+            self.screen.blit(self.gameover_text, (100, 300))
 
     def check_collisions(self, centerX, centerY):
         num1 = ((self.__HEIGHT - 50) // 32)
@@ -227,12 +240,43 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     self.player.direction_command = 0
-                elif event.key == pygame.K_LEFT:
+                if event.key == pygame.K_LEFT:
                     self.player.direction_command = 1
-                elif event.key == pygame.K_UP:
+                if event.key == pygame.K_UP:
                     self.player.direction_command = 2
-                elif event.key == pygame.K_DOWN:
+                if event.key == pygame.K_DOWN:
                     self.player.direction_command = 3
+                if event.key == pygame.K_SPACE and (self.game_over or self.game_won):
+                    self.player.lives -= 1
+                    self.startUpCounter = 0
+                    self.powerUp = False
+                    self.powerCount = 0
+                    self.player.x = 450
+                    self.player.y = 663
+                    self.player.direction = 0
+                    self.player.direction_command = 0
+                    self.blinky.x = 56
+                    self.blinky.y = 58
+                    self.blinky.direction = 0
+                    self.inky.x = 440
+                    self.inky.y = 388
+                    self.inky.direction = 2
+                    self.pinky.x = 440
+                    self.pinky.y = 438
+                    self.pinky.direction = 2
+                    self.clyde.x = 440
+                    self.clyde.y = 438
+                    self.clyde.direction = 2
+                    self.eatenGhosts = [False, False, False, False]
+                    self.blinky.dead = False
+                    self.inky.dead = False
+                    self.clyde.dead = False
+                    self.pinky.dead = False
+                    self.score = 0
+                    self.player.lives = 3
+                    self.level = copy.deepcopy(boards)
+                    self.game_over = False
+                    self.game_won = False
                     
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT and self.player.direction_command == 0:
@@ -275,7 +319,7 @@ class Game:
                 self.powerUp = False
                 self.eatenGhosts = [False, False, False, False]
                 
-            if self.startUpCounter < 180:
+            if self.startUpCounter < 180 and not self.game_over and not self.game_won:
                 self.moving = False
                 self.startUpCounter += 1
             else:
@@ -306,6 +350,11 @@ class Game:
                 self.ghost_speeds[2] = 4
             if self.clyde.dead:
                 self.ghost_speeds[3] = 4
+            
+            self.game_won = True
+            for i in range(len(self.level)):
+                if 1 in self.level[i] or 2 in self.level[i]:
+                    self.game_won = False
                     
             player_circle = pygame.draw.circle(self.screen, 'black', (centerX, centerY), 20, 2)
             self.player.draw(self.screen)
